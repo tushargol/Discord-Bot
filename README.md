@@ -14,26 +14,26 @@ A feature-rich Discord bot for managing personal to-do lists with encrypted stor
 - 🧹 **Clear completed** - Remove all completed tasks at once
 - 🗑️ **Clear all** - Remove all tasks (use with caution!)
 
-### ⏰ **Dual Reminder System**
-- 🔔 **Custom reminders** - Create standalone reminders with `!remindme <message> | <time>`
-- ⏰ **Task deadlines** - Set deadlines for tasks with automatic 12-hour reminders
-- 📅 **List reminders** - View all your active reminders
-- 🗑️ **Delete reminders** - Remove specific reminders
-- 🧹 **Clear reminders** - Remove all your reminders at once
-- 📱 **Private delivery** - All reminders sent via DM only
+### **Dual Reminder System**
+- **Custom reminders** - Create standalone reminders with `!remindme <message> | <time>`
+- **Task deadlines** - Set deadlines for tasks with automatic 12-hour reminders
+- **List reminders** - View all your active reminders
+- **Delete reminders** - Remove specific reminders
+- **Clear reminders** - Remove all your reminders at once
+- **Private delivery** - All reminders sent via DM only
 
 ### 🔒 **Privacy & Security**
-- 🔐 **Encrypted storage** - All data encrypted with AES-256
-- 🆔 **User isolation** - Each user has their own private to-do list
-- 🔒 **Data hashing** - User IDs and content hashed for additional privacy
-- 🛡️ **Secure reminders** - Reminder messages encrypted and hashed
+- **Encrypted storage** - All data encrypted with AES-256
+- **User isolation** - Each user has their own private to-do list
+- **Data hashing** - User IDs and content hashed for additional privacy
+- 🛡**Secure reminders** - Reminder messages encrypted and hashed
 
 ### 🎯 **User Experience**
-- 🤖 **Welcome messages** - Bot introduces itself when joining servers
-- 💬 **DM support** - Interact with the bot via private messages
-- 📊 **Progress tracking** - See completion status of your tasks
-- ⚡ **Responsive reminders** - Checked every minute for immediate delivery
-- 🎨 **Rich embeds** - Beautiful, organized display with colors and emojis
+- **Welcome messages** - Bot introduces itself when joining servers
+- **DM support** - Interact with the bot via private messages
+- **Progress tracking** - See completion status of your tasks
+- **Responsive reminders** - Checked every minute for immediate delivery
+- **Rich embeds** - Beautiful, organized display with colors and emojis
 
 ## 🚀 Quick Start
 
@@ -297,4 +297,4 @@ Feel free to submit issues, feature requests, or pull requests to improve the bo
 
 ---
 
-**Enjoy your encrypted, private to-do list management with deadlines and reminders! 🔐📋⏰** 
+**Enjoy your encrypted, private to-do list management with deadlines and reminders!** 
