@@ -1,0 +1,9 @@
+# Discord Bot Configuration
+# Replace 'YOUR_BOT_TOKEN_HERE' with your actual Discord bot token
+DISCORD_TOKEN=YOUR_BOT_TOKEN_HERE
+
+# Encryption Configuration (Optional)
+# Set a strong encryption key for database security
+ENCRYPTION_KEY=your-strong-encryption-key-here
+# Set to 'false' to disable encryption (not recommended for production)
+ENABLE_ENCRYPTION=true
