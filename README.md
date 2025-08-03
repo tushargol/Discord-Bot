@@ -287,9 +287,6 @@ ENABLE_ENCRYPTION=true
 - Reminder check interval: 1 minute
 - Deadline reminder: 12 hours before due
 
-## 📝 **License**
-
-This project is open source and available under the MIT License.
 
 ## 🤝 **Contributing**
 
