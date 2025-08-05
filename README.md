@@ -269,8 +269,3 @@ ENABLE_ENCRYPTION=true
 ## 🤝 **Contributing**
 
 Feel free to submit issues, feature requests, or pull requests to improve the bot!
-
----
-
-**Enjoy your encrypted, private to-do list management with deadlines and reminders!** 
->>>>>>> dcfafb7f36b67c1910f4be0cf8377444ffc441c1
