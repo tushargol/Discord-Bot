@@ -4,14 +4,45 @@ from discord.ext import commands
 from database import TodoDatabase
 from config import MAX_TASK_LENGTH
 from datetime import datetime, timedelta
+from functools import lru_cache
 
 class TodoCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = TodoDatabase()
+        
+        # Cache for datetime parsing patterns
+        self._time_patterns = [
+            (r'(\d+)\s*years?', lambda x: timedelta(days=x*365)),
+            (r'(\d+)\s*months?', lambda x: timedelta(days=x*30)),
+            (r'(\d+)\s*weeks?', lambda x: timedelta(weeks=x)),
+            (r'(\d+)\s*days?', lambda x: timedelta(days=x)),
+            (r'(\d+)\s*hours?', lambda x: timedelta(hours=x)),
+            (r'(\d+)\s*minutes?', lambda x: timedelta(minutes=x)),
+            (r'(\d+)\s*mins?', lambda x: timedelta(minutes=x)),
+            (r'(\d+)\s*hrs?', lambda x: timedelta(hours=x)),
+            (r'(\d+)\s*hr', lambda x: timedelta(hours=x)),
+            (r'(\d+)\s*min', lambda x: timedelta(minutes=x))
+        ]
+        
+        self._date_formats = [
+            "%Y-%m-%d %H:%M",
+            "%m/%d/%Y %H:%M",
+            "%d/%m/%Y %H:%M",
+            "%Y-%m-%d %H:%M:%S",
+            "%m/%d/%Y %H:%M:%S",
+            "%d/%m/%Y %H:%M:%S"
+        ]
+        
+        self._date_only_formats = [
+            "%Y-%m-%d",
+            "%m/%d/%Y",
+            "%d/%m/%Y"
+        ]
     
+    @lru_cache(maxsize=128)
     def _parse_deadline(self, deadline_str: str) -> str:
-        """Parse deadline string and return ISO format datetime"""
+        """Parse deadline string and return ISO format datetime - optimized with caching"""
         deadline_str = deadline_str.strip().lower()
         now = datetime.now()
         
@@ -112,7 +143,7 @@ class TodoCommands(commands.Cog):
             return "invalid", "Invalid deadline"
     
     def _parse_reminder_time(self, time_str: str) -> datetime:
-        """Parse various time formats for reminders"""
+        """Parse various time formats for reminders - optimized"""
         time_str = time_str.lower().strip()
         now = datetime.now()
         
@@ -120,21 +151,8 @@ class TodoCommands(commands.Cog):
         if time_str.startswith('in '):
             time_str = time_str[3:]  # Remove "in "
             
-            # Parse different time units
-            time_patterns = [
-                (r'(\d+)\s*years?', lambda x: timedelta(days=x*365)),
-                (r'(\d+)\s*months?', lambda x: timedelta(days=x*30)),
-                (r'(\d+)\s*weeks?', lambda x: timedelta(weeks=x)),
-                (r'(\d+)\s*days?', lambda x: timedelta(days=x)),
-                (r'(\d+)\s*hours?', lambda x: timedelta(hours=x)),
-                (r'(\d+)\s*minutes?', lambda x: timedelta(minutes=x)),
-                (r'(\d+)\s*mins?', lambda x: timedelta(minutes=x)),
-                (r'(\d+)\s*hrs?', lambda x: timedelta(hours=x)),
-                (r'(\d+)\s*hr', lambda x: timedelta(hours=x)),
-                (r'(\d+)\s*min', lambda x: timedelta(minutes=x))
-            ]
-            
-            for pattern, time_func in time_patterns:
+            # Use cached patterns for better performance
+            for pattern, time_func in self._time_patterns:
                 match = re.search(pattern, time_str)
                 if match:
                     amount = int(match.group(1))
@@ -165,17 +183,8 @@ class TodoCommands(commands.Cog):
             else:
                 # Date and time format
                 try:
-                    # Try various date formats
-                    date_formats = [
-                        "%Y-%m-%d %H:%M",
-                        "%m/%d/%Y %H:%M",
-                        "%d/%m/%Y %H:%M",
-                        "%Y-%m-%d %H:%M:%S",
-                        "%m/%d/%Y %H:%M:%S",
-                        "%d/%m/%Y %H:%M:%S"
-                    ]
-                    
-                    for fmt in date_formats:
+                    # Use cached date formats for better performance
+                    for fmt in self._date_formats:
                         try:
                             return datetime.strptime(time_str, fmt)
                         except ValueError:
@@ -187,14 +196,8 @@ class TodoCommands(commands.Cog):
         
         # Handle specific dates
         try:
-            # Try date-only formats
-            date_formats = [
-                "%Y-%m-%d",
-                "%m/%d/%Y",
-                "%d/%m/%Y"
-            ]
-            
-            for fmt in date_formats:
+            # Use cached date-only formats for better performance
+            for fmt in self._date_only_formats:
                 try:
                     date_obj = datetime.strptime(time_str, fmt)
                     # Set to 9 AM on that date
@@ -224,6 +227,35 @@ class TodoCommands(commands.Cog):
             return f"in {hours}h {minutes}m ({reminder_time.strftime('%m-%d %H:%M')})"
         else:
             return f"in {minutes}m ({reminder_time.strftime('%H:%M')})"
+    
+    def _create_task_embed(self, title: str, description: str, color: discord.Color, task_id: int, task: str, deadline: str = None, user_id: str = None, author_name: str = None) -> discord.Embed:
+        """Create a standardized task embed - optimized to reduce code duplication"""
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            color=color,
+            timestamp=discord.utils.utcnow()
+        )
+        
+        if deadline:
+            status, time_remaining = self._get_deadline_status(deadline)
+            embed.add_field(
+                name="⏰ Deadline",
+                value=f"{self._format_deadline(deadline)}\n{time_remaining}",
+                inline=True
+            )
+        
+        if user_id:
+            embed.add_field(
+                name="👤 User",
+                value=f"<@{user_id}>",
+                inline=True
+            )
+        
+        if author_name:
+            embed.set_footer(text=f"Requested by {author_name}")
+        
+        return embed
     
     @commands.command(name='add', help='Add a new task to your to-do list')
     async def add_task(self, ctx, *, task_input: str):
@@ -255,25 +287,14 @@ class TodoCommands(commands.Cog):
             tasks = self.db.get_tasks(user_id)
             task_id = len(tasks)
             
-            embed = discord.Embed(
+            embed = self._create_task_embed(
                 title="✅ Task Added!",
                 description=f"**Task #{task_id}:** {task}",
                 color=discord.Color.green(),
-                timestamp=discord.utils.utcnow()
-            )
-            
-            if deadline:
-                status, time_remaining = self._get_deadline_status(deadline)
-                embed.add_field(
-                    name="⏰ Deadline",
-                    value=f"{self._format_deadline(deadline)}\n{time_remaining}",
-                    inline=True
-                )
-            
-            embed.add_field(
-                name="👤 User",
-                value=f"<@{user_id}>",
-                inline=True
+                task_id=task_id,
+                task=task,
+                deadline=deadline,
+                user_id=user_id
             )
             
             embed.set_footer(text="Use !list to see your tasks")
@@ -304,16 +325,14 @@ class TodoCommands(commands.Cog):
         self.db._save_data()
         
         status, time_remaining = self._get_deadline_status(deadline)
-        embed = discord.Embed(
+        embed = self._create_task_embed(
             title="⏰ Deadline Updated!",
             description=f"**Task #{task_id}:** {task['task']}",
             color=discord.Color.blue(),
-            timestamp=discord.utils.utcnow()
-        )
-        embed.add_field(
-            name="New Deadline",
-            value=f"{self._format_deadline(deadline)}\n{time_remaining}",
-            inline=True
+            task_id=task_id,
+            task=task['task'],
+            deadline=deadline,
+            author_name=ctx.author.display_name
         )
         embed.set_footer(text=f"Updated by {ctx.author.display_name}")
         await ctx.send(embed=embed)
@@ -553,20 +572,15 @@ class TodoCommands(commands.Cog):
         success = self.db.complete_task(user_id, task_id)
         
         if success:
-            embed = discord.Embed(
+            embed = self._create_task_embed(
                 title="✅ Task Completed!",
                 description=f"**Task #{task_id}:** {task['task']}",
                 color=discord.Color.green(),
-                timestamp=discord.utils.utcnow()
+                task_id=task_id,
+                task=task['task'],
+                deadline=task.get('deadline'),
+                author_name=ctx.author.display_name
             )
-            
-            if task.get('deadline'):
-                embed.add_field(
-                    name="⏰ Original Deadline",
-                    value=self._format_deadline(task['deadline']),
-                    inline=True
-                )
-            
             embed.set_footer(text=f"Completed by {ctx.author.display_name}")
             await ctx.send(embed=embed)
         else:
@@ -589,11 +603,13 @@ class TodoCommands(commands.Cog):
         success = self.db.uncomplete_task(user_id, task_id)
         
         if success:
-            embed = discord.Embed(
+            embed = self._create_task_embed(
                 title="⏳ Task Uncompleted!",
                 description=f"**Task #{task_id}:** {task['task']}",
                 color=discord.Color.orange(),
-                timestamp=discord.utils.utcnow()
+                task_id=task_id,
+                task=task['task'],
+                author_name=ctx.author.display_name
             )
             embed.set_footer(text=f"Uncompleted by {ctx.author.display_name}")
             await ctx.send(embed=embed)
@@ -613,11 +629,13 @@ class TodoCommands(commands.Cog):
         success = self.db.remove_task(user_id, task_id)
         
         if success:
-            embed = discord.Embed(
+            embed = self._create_task_embed(
                 title="🗑️ Task Removed!",
                 description=f"**Task #{task_id}:** {task['task']}",
                 color=discord.Color.red(),
-                timestamp=discord.utils.utcnow()
+                task_id=task_id,
+                task=task['task'],
+                author_name=ctx.author.display_name
             )
             embed.set_footer(text=f"Removed by {ctx.author.display_name}")
             await ctx.send(embed=embed)
@@ -715,6 +733,44 @@ class TodoCommands(commands.Cog):
         embed.set_footer(text="Your data is encrypted and private - only you can see your tasks and reminders!")
         
         await ctx.send(embed=embed)
+    
+    @commands.command(name='performance', help='Show bot performance metrics')
+    async def performance_command(self, ctx):
+        """Show bot performance metrics"""
+        try:
+            from performance_monitor import performance_monitor
+            
+            # Record system metrics
+            performance_monitor.record_system_metrics()
+            
+            # Get performance embed
+            embed_data = performance_monitor.get_performance_embed()
+            
+            if embed_data:
+                embed = discord.Embed(
+                    title=embed_data['title'],
+                    color=embed_data['color'],
+                    timestamp=discord.utils.utcnow()
+                )
+                
+                for field in embed_data['fields']:
+                    embed.add_field(
+                        name=field['name'],
+                        value=field['value'],
+                        inline=field.get('inline', True)
+                    )
+                
+                if 'footer' in embed_data:
+                    embed.set_footer(text=embed_data['footer']['text'])
+                
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send("❌ Performance metrics not available.")
+                
+        except ImportError:
+            await ctx.send("❌ Performance monitoring not enabled.")
+        except Exception as e:
+            await ctx.send(f"❌ Error getting performance metrics: {e}")
 
 async def setup(bot):
     await bot.add_cog(TodoCommands(bot)) 
