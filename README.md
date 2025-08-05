@@ -11,6 +11,7 @@ A feature-rich Discord bot for managing personal to-do lists with deadlines, rem
 - **📊 Performance Monitoring**: Built-in performance metrics
 - **⚡ Optimized**: High-performance architecture with caching
 
+<<<<<<< HEAD
 ## 🚀 Performance Optimizations
 
 ### Database Optimizations
@@ -24,6 +25,28 @@ A feature-rich Discord bot for managing personal to-do lists with deadlines, rem
 - **Reduced Check Frequency**: Configurable reminder check intervals
 - **Memory Management**: Automatic cleanup of old performance data
 - **Command Optimization**: Cached datetime parsing and embed creation
+=======
+### **Dual Reminder System**
+- **Custom reminders** - Create standalone reminders with `!remindme <message> | <time>`
+- **Task deadlines** - Set deadlines for tasks with automatic 12-hour reminders
+- **List reminders** - View all your active reminders
+- **Delete reminders** - Remove specific reminders
+- **Clear reminders** - Remove all your reminders at once
+- **Private delivery** - All reminders sent via DM only
+
+### 🔒 **Privacy & Security**
+- **Encrypted storage** - All data encrypted with AES-256
+- **User isolation** - Each user has their own private to-do list
+- **Data hashing** - User IDs and content hashed for additional privacy
+- 🛡**Secure reminders** - Reminder messages encrypted and hashed
+
+### 🎯 **User Experience**
+- **Welcome messages** - Bot introduces itself when joining servers
+- **DM support** - Interact with the bot via private messages
+- **Progress tracking** - See completion status of your tasks
+- **Responsive reminders** - Checked every minute for immediate delivery
+- **Rich embeds** - Beautiful, organized display with colors and emojis
+>>>>>>> dcfafb7f36b67c1910f4be0cf8377444ffc441c1
 
 ### System Monitoring
 - **Real-time Metrics**: CPU, memory, and operation tracking
@@ -212,6 +235,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🆘 Support
 
+<<<<<<< HEAD
 If you encounter any issues or have questions:
 1. Check the documentation above
 2. Review the error logs
@@ -220,3 +244,33 @@ If you encounter any issues or have questions:
 ---
 
 **Note**: This bot is optimized for performance and privacy. All user data is encrypted and isolated per user. 
+=======
+## 🔧 **Advanced Configuration**
+
+### **Environment Variables**
+```env
+# Required
+DISCORD_TOKEN=your_bot_token_here
+
+# Optional (recommended for production)
+ENCRYPTION_KEY=your-strong-encryption-key-here
+ENABLE_ENCRYPTION=true
+```
+
+### **Bot Settings**
+- Maximum tasks per user: 50
+- Maximum reminders per user: 20
+- Maximum task length: 200 characters
+- Maximum reminder message length: 200 characters
+- Reminder check interval: 1 minute
+- Deadline reminder: 12 hours before due
+
+
+## 🤝 **Contributing**
+
+Feel free to submit issues, feature requests, or pull requests to improve the bot!
+
+---
+
+**Enjoy your encrypted, private to-do list management with deadlines and reminders!** 
+>>>>>>> dcfafb7f36b67c1910f4be0cf8377444ffc441c1
