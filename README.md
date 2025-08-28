@@ -46,7 +46,6 @@ A feature-rich Discord bot for managing personal to-do lists with deadlines, rem
 - **Progress tracking** - See completion status of your tasks
 - **Responsive reminders** - Checked every minute for immediate delivery
 - **Rich embeds** - Beautiful, organized display with colors and emojis
->>>>>>> dcfafb7f36b67c1910f4be0cf8377444ffc441c1
 
 ### System Monitoring
 - **Real-time Metrics**: CPU, memory, and operation tracking
