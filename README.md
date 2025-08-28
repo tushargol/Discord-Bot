@@ -11,7 +11,7 @@ A feature-rich Discord bot for managing personal to-do lists with deadlines, rem
 - **📊 Performance Monitoring**: Built-in performance metrics
 - **⚡ Optimized**: High-performance architecture with caching
 
-<<<<<<< HEAD
+
 ## 🚀 Performance Optimizations
 
 ### Database Optimizations
@@ -235,7 +235,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🆘 Support
 
-<<<<<<< HEAD
 If you encounter any issues or have questions:
 1. Check the documentation above
 2. Review the error logs
